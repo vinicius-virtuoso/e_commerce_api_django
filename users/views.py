@@ -28,3 +28,13 @@ class ListUsersView(ListAPIView):
 
     queryset = User.objects.all().order_by("id")
     serializer_class = UserSerializer
+
+
+class ProfileView(RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+    def get_object(self):
+        user = User.objects.get(id=self.request.user.id)
+        return user
