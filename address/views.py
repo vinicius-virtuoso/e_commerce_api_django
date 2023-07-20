@@ -1,3 +1,15 @@
-from django.shortcuts import render
+from rest_framework.generics import CreateAPIView
+from rest_framework.permissions import IsAuthenticated
 
-# Create your views here.
+from address.models import Address
+from address.serializires import AddressSerializer
+
+
+class AddressCreateView(CreateAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = Address.objects.all()
+    serializer_class = AddressSerializer
+    
+    def perform_create(self, serializer):
+      user = self.request.user
+      serializer.save(user=user)

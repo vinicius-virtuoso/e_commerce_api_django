@@ -44,8 +44,16 @@ class TestUserViews(TestCase):
             "password": cls.user_data.get("password"),
         }
 
-        response_admin = cls.client.post(path=cls.auth_url, data=cls.admin_data_request,content_type='application/json')
-        response_user = cls.client.post(path=cls.auth_url, data=cls.user_data_request,content_type='application/json')
+        response_admin = cls.client.post(
+            path=cls.auth_url,
+            data=cls.admin_data_request,
+            content_type="application/json",
+        )
+        response_user = cls.client.post(
+            path=cls.auth_url,
+            data=cls.user_data_request,
+            content_type="application/json",
+        )
 
         cls.token_admin = response_admin.data.get("access")
         cls.token_user = response_user.data.get("access")
@@ -72,22 +80,21 @@ class TestUserViews(TestCase):
             "email": "george_updated@example.com",
             "username": "george_user_updated",
         }
-        
-    
+
     def test_cant_create_user_if_already_existing(self):
         response = self.client.post(
-            path=self.register_url, data=self.user_data_request,
-            content_type='application/json'
+            path=self.register_url,
+            data=self.user_data_request,
+            content_type="application/json",
         )
-        
-        self.assertEqual(response.status_code,400)
 
-            
+        self.assertEqual(response.status_code, 400)
 
     def test_can_create_a_user(self):
         response = self.client.post(
-            path=self.register_url, data=self.user_data_for_eatch,
-            content_type='application/json'
+            path=self.register_url,
+            data=self.user_data_for_eatch,
+            content_type="application/json",
         )
 
         self.assertEqual(response.status_code, 201)
@@ -95,7 +102,9 @@ class TestUserViews(TestCase):
 
     def test_raise_exception_when_field_is_not_present_in_body(self):
         invalid_user = {}
-        response = self.client.post(path=self.register_url, data=invalid_user,content_type='application/json')
+        response = self.client.post(
+            path=self.register_url, data=invalid_user, content_type="application/json"
+        )
 
         expected_response = {
             "username": ["This field may not be blank.", "This field is required."],
@@ -262,17 +271,13 @@ class TestUserViews(TestCase):
         )
 
         self.assertEqual(response.status_code, 204)
-        
 
     def test_cant_see_list_all_users_if_missing_token(self):
-        response = self.client.get(
-            path=self.users_url
-        )
-        
+        response = self.client.get(path=self.users_url)
+
         expected_response = "Authentication credentials were not provided."
         self.assertContains(response, expected_response, status_code=401)
-        
-        
+
     def test_cant_list_all_user_if_invalid_token(self):
         response = self.client.delete(
             path=self.user_details_url_admin,
@@ -281,92 +286,85 @@ class TestUserViews(TestCase):
 
         expected_response = "Given token not valid for any token type"
         self.assertContains(response, expected_response, status_code=401)
-        
-        
+
     def test_cant_see_list_all_users_if_not_admin(self):
         response = self.client.get(
             path=self.users_url,
             headers={"Authorization": f"Bearer {self.token_user}"},
         )
-        
+
         expected_response = "You do not have permission to perform this action."
         self.assertContains(response, expected_response, status_code=403)
-    
+
     def test_can_list_users_only_to_be_admin(self):
         response = self.client.get(
-            path=self.users_url,
-            headers={"Authorization": f"Bearer {self.token_admin}"}
+            path=self.users_url, headers={"Authorization": f"Bearer {self.token_admin}"}
         )
-        
+
         self.assertIsInstance(response.data, list)
         self.assertEqual(response.status_code, 200)
-        
+
     def test_cant_see_profile_if_not_authenticated(self):
         response = self.client.get(
             path=self.profile_url,
         )
-        
+
         expected_response = "Authentication credentials were not provided."
         self.assertContains(response, expected_response, status_code=401)
-        
-        
+
     def test_cant_see_profile_if_invalid_token(self):
         response = self.client.get(
             path=self.profile_url,
             headers={"Authorization": "Bearer sdsddasdadsdsdsd"},
         )
-        
+
         expected_response = "Given token not valid for any token type"
         self.assertContains(response, expected_response, status_code=401)
-        
-        
+
     def test_can_see_self_profile(self):
         response = self.client.get(
             path=self.profile_url,
-            headers={"Authorization": f"Bearer {self.token_user}"}
+            headers={"Authorization": f"Bearer {self.token_user}"},
         )
-        
+
         self.assertIsInstance(response.data, dict)
         self.assertEqual(response.status_code, 200)
-        
-        
+
     def test_can_update_self_profile_successfully(self):
         response = self.client.patch(
             path=self.profile_url,
-            data={'first_name': 'user_upadated'},
+            data={"first_name": "user_upadated"},
             headers={"Authorization": f"Bearer {self.token_user}"},
-            content_type='application/json'
+            content_type="application/json",
         )
-        
-        expected_response = {'first_name': 'user_upadated'}
-        
+
+        expected_response = {"first_name": "user_upadated"}
+
         self.assertIsInstance(response.data, dict)
         self.assertContains(response, "user_upadated", 1, status_code=200)
         self.assertDictContainsSubset(expected_response, response.data)
-        
-    
+
     def test_cant_delete_self_profile_if_not_authenticated(self):
         response = self.client.delete(
             path=self.profile_url,
         )
-        
+
         expected_response = "Authentication credentials were not provided."
         self.assertContains(response, expected_response, status_code=401)
-        
+
     def test_cant_delete_self_profile_if_invalid_token(self):
         response = self.client.delete(
             path=self.profile_url,
             headers={"Authorization": "Bearer sdsddasdadsdsdsd"},
         )
-        
+
         expected_response = "Given token not valid for any token type"
         self.assertContains(response, expected_response, status_code=401)
-        
-    
+
     def test_can_delete_self_profile_successfully(self):
         response = self.client.delete(
             path=self.profile_url,
             headers={"Authorization": f"Bearer {self.token_user}"},
         )
-        
+
         self.assertEqual(response.status_code, 204)
