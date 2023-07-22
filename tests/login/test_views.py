@@ -4,19 +4,18 @@ from users.models import User
 
 
 class TestLoginViews(TestCase):
-    def setUp(self):
-        self.client = Client()
-        self.login_url = reverse("auth")
+    @classmethod
+    def setUpTestData(cls) -> None:
+        cls.client = Client()
+        cls.login_url = reverse("auth")
 
-        self.invalid_user = {
+        cls.invalid_user = {
             "username": "invalid_user",
             "password": "99999999999999999",
         }
-        self.required_fields = {"password": "99999999999999999"}
-        self.fields_blank = {"username": "", "password": ""}
+        cls.required_fields = {"password": "99999999999999999"}
+        cls.fields_blank = {"username": "", "password": ""}
 
-    @classmethod
-    def setUpTestData(cls) -> None:
         cls.user_data = {
             "first_name": "George",
             "last_name": "Clooney",

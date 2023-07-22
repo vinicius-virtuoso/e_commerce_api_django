@@ -9,7 +9,7 @@ class AddressCreateView(CreateAPIView):
     permission_classes = [IsAuthenticated]
     queryset = Address.objects.all()
     serializer_class = AddressSerializer
-    
+
     def perform_create(self, serializer):
-      user = self.request.user
-      serializer.save(user=user)
+        user = self.request.user
+        serializer.save(user=user)

@@ -16,9 +16,11 @@ class AddressSerializer(serializers.ModelSerializer):
             "complement",
         ]
 
-    def create(self,validated_data:dict):
-      address_exists = Address.objects.filter(user=validated_data["user"]).exists()
-      if address_exists:
-            raise serializers.ValidationError({"detail": "Address has already been added to this user."})
-      address = Address.objects.create(**validated_data)
-      return address
+    def create(self, validated_data: dict):
+        address_exists = Address.objects.filter(user=validated_data["user"]).exists()
+        if address_exists:
+            raise serializers.ValidationError(
+                {"detail": "Address has already been added to this user."}
+            )
+        address = Address.objects.create(**validated_data)
+        return address
