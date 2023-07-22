@@ -8,7 +8,7 @@ class TestAddress(TestCase):
     @classmethod
     def setUpTestData(cls) -> None:
         cls.client = Client()
-        cls.address_create_url = reverse("create_address")
+        cls.address_url = reverse("address")
         cls.login_url = reverse("auth")
 
         cls.user_data = {
@@ -72,7 +72,7 @@ class TestAddress(TestCase):
 
     def test_cant_create_address_if_not_authenticated(self):
         response = self.client.post(
-            path=self.address_create_url,
+            path=self.address_url,
             data=self.address_data,
             content_type="application/json",
         )
@@ -84,7 +84,7 @@ class TestAddress(TestCase):
 
     def test_cant_create_address_if_already_existing(self):
         response = self.client.post(
-            path=self.address_create_url,
+            path=self.address_url,
             data=self.address_data,
             content_type="application/json",
             headers={"Authorization": "Bearer " + self.token},
@@ -95,7 +95,7 @@ class TestAddress(TestCase):
 
     def test_cant_create_address_if_token_is_invalid(self):
         response = self.client.post(
-            path=self.address_create_url,
+            path=self.address_url,
             data=self.address_data,
             content_type="application/json",
             headers={"Authorization": "Bearer ssssssssssssssasasa"},
@@ -108,7 +108,7 @@ class TestAddress(TestCase):
         invalid_address = {}
 
         response = self.client.post(
-            path=self.address_create_url,
+            path=self.address_url,
             data=invalid_address,
             content_type="application/json",
             headers={"Authorization": "Bearer " + self.token},
@@ -142,7 +142,7 @@ class TestAddress(TestCase):
         invalid_state_address["state"] = "FFFDDA"
 
         response = self.client.post(
-            path=self.address_create_url,
+            path=self.address_url,
             data=invalid_state_address,
             content_type="application/json",
             headers={"Authorization": "Bearer " + self.token},
@@ -153,7 +153,7 @@ class TestAddress(TestCase):
 
     def test_can_create_address(self):
         response = self.client.post(
-            path=self.address_create_url,
+            path=self.address_url,
             data=self.address_data,
             content_type="application/json",
             headers={"Authorization": "Bearer " + self.token_user_without_address},
@@ -171,3 +171,99 @@ class TestAddress(TestCase):
 
         self.assertDictContainsSubset(expected_response, response.data)
         self.assertEqual(response.status_code, 201)
+
+    def test_cant_update_address_is_not_authenticated(self):
+        response = self.client.patch(
+            path=self.address_url,
+            data={"street": "Rua de update"},
+            content_type="application/json",
+        )
+
+        expected_response = {"detail": "Authentication credentials were not provided."}
+
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.data, expected_response)
+
+    def test_cant_update_address_if_invalid_token(self):
+        response = self.client.patch(
+            path=self.address_url,
+            data={"street": "Rua de update"},
+            content_type="application/json",
+            headers={"Authorization": "Bearer ssssssssssssssasasa"},
+        )
+
+        expected_response = "Given token not valid for any token type"
+        self.assertContains(response, expected_response, status_code=401)
+
+    def test_cant_update_address_if_not_found(self):
+        response = self.client.patch(
+            path=self.address_url,
+            data={"street": "Rua de update"},
+            content_type="application/json",
+            headers={"Authorization": "Bearer " + self.token_user_without_address},
+        )
+
+        expected_response = {"detail": "Not found."}
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.data, expected_response)
+
+    def test_cant_update_address_if_invalid_state(self):
+        invalid_state_address = self.address_data
+        invalid_state_address["state"] = "FFFDDA"
+
+        response = self.client.patch(
+            path=self.address_url,
+            data=invalid_state_address,
+            content_type="application/json",
+            headers={"Authorization": "Bearer " + self.token},
+        )
+
+        expected_response = "is not a valid choice."
+        self.assertContains(response, expected_response, status_code=400)
+
+    def test_cant_update_address_successfully(self):
+        response = self.client.patch(
+            path=self.address_url,
+            data={"street": "Rua de update"},
+            content_type="application/json",
+            headers={"Authorization": "Bearer " + self.token},
+        )
+
+        expected_response = {"street": "Rua de update"}
+        self.assertEqual(response.status_code, 200)
+        self.assertDictContainsSubset(expected_response, response.data)
+
+    def test_cant_delete_address_if_not_authenticated(self):
+        response = self.client.delete(path=self.address_url)
+
+        expected_response = {"detail": "Authentication credentials were not provided."}
+
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.data, expected_response)
+
+    def test_cant_delete_address_if_invalid_token(self):
+        response = self.client.delete(
+            path=self.address_url,
+            headers={"Authorization": "Bearer ssssssssssssssasasa"},
+        )
+
+        expected_response = "Given token not valid for any token type"
+        self.assertContains(response, expected_response, status_code=401)
+
+    def test_cant_delete_address_if_not_found(self):
+        response = self.client.delete(
+            path=self.address_url,
+            headers={"Authorization": "Bearer " + self.token_user_without_address},
+        )
+
+        expected_response = {"detail": "Not found."}
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.data, expected_response)
+
+    def test_can_delete_address_successfully(self):
+        response = self.client.delete(
+            path=self.address_url,
+            headers={"Authorization": "Bearer " + self.token},
+        )
+
+        self.assertEqual(response.status_code, 204)
