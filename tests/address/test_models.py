@@ -67,7 +67,7 @@ class AddressModelTest(TestCase):
         self.assertEqual(related_user.get_username(), expected.get_username())
 
     def test_if_raise_error_when_address_already_have_an_user(self):
-        with self.assertRaises(IntegrityError):  # (4)
-            address_two = Address.objects.create(**self.address_data)  # (5)
-            address_two.user = self.user  # (6)
+        with self.assertRaises(IntegrityError):  
+            address_two = Address.objects.create(**self.address_data) 
+            address_two.user = self.user 
             address_two.save()
