@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from rest_framework.generics import CreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAuthenticated
 
@@ -17,3 +18,9 @@ class AddressCreateView(CreateAPIView):
 
 class AddressDetailsView(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
+    queryset = Address.objects.all()
+    serializer_class = AddressSerializer
+    
+    def get_object(self):
+        address = get_object_or_404(Address,user=self.request.user)
+        return address
