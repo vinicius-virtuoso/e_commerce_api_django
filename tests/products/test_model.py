@@ -44,4 +44,7 @@ class TestProduct(TestCase):
 
     def test_image_product_max_length(self):
         image_default = self.image_product._meta.get_field("image_url").default
-        self.assertEqual(image_default, "https://res.cloudinary.com/dnkw0zu2x/image/upload/v1688328201/django_commerce/no-photo.png")
+        self.assertEqual(
+            image_default,
+            "https://res.cloudinary.com/dnkw0zu2x/image/upload/v1688328201/django_commerce/no-photo.png",
+        )
