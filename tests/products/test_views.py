@@ -396,6 +396,7 @@ class TestProductViews(APITestCase):
 
         expected_response = "You do not have permission to perform this action."
         self.assertContains(response, expected_response, status_code=403)
+        
 
     # def test_cant_delete_product_if_existing_orders(self):
     #     response = self.client.delete(

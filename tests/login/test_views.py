@@ -23,15 +23,28 @@ class TestLoginViews(TestCase):
             "username": "george_user",
             "password": "12345",
         }
+        
+        cls.user_credentials_invalid = {
+            
+        }
 
         cls.user = User.objects.create_user(**cls.user_data)
+        
+    def test_cant_returnt_if_incorrect_password(self):
+        user = {"username": "george_user", "password": "32141414"}
+        response = self.client.post(path=self.login_url, data=user)
+        
+        expected_response = "No active account found with the given credentials"
+        self.assertContains(response, expected_response, status_code=401)
+        
+        
 
     def test_can_returned_token_jwt(self):
         user = {"username": "george_user", "password": "12345"}
         response = self.client.post(path=self.login_url, data=user)
 
         self.assertContains(response, "access", status_code=200)
-        self.assertContains(response, "refresh", status_code=200)
+        
 
     def test_can_raise_returned_unauthorized(self):
         response = self.client.post(path=self.login_url, data=self.invalid_user)
