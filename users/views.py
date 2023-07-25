@@ -1,4 +1,4 @@
-from rest_framework.views import APIView, Response, Request
+from rest_framework.views import APIView, Response, Request, status
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListAPIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from users.permissions import OnwerOrAdmin
@@ -11,8 +11,10 @@ class UserCreateView(APIView):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             User.objects.create_user(**serializer.validated_data)
-            return Response({"success": "User created successfully."}, status=201)
-        return Response(serializer.errors, status=400)
+            return Response(
+                {"success": "User created successfully."}, status.HTTP_201_CREATED
+            )
+        return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
 
 
 class UserDetailView(RetrieveUpdateDestroyAPIView):

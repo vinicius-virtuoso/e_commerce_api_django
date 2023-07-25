@@ -20,7 +20,7 @@ class AddressDetailsView(RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
     queryset = Address.objects.all()
     serializer_class = AddressSerializer
-    
+
     def get_object(self):
-        address = get_object_or_404(Address,user=self.request.user)
+        address = get_object_or_404(Address, user=self.request.user)
         return address

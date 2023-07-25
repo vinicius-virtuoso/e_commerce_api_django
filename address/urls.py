@@ -1,6 +1,6 @@
 from django.urls import path
 
-from address.views import AddressCreateView,AddressDetailsView
+from address.views import AddressCreateView, AddressDetailsView
 
 urlpatterns = [
     path("profile/address/create/", AddressCreateView.as_view(), name="address_create"),

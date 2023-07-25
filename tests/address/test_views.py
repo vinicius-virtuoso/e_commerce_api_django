@@ -4,7 +4,7 @@ from users.models import User
 from django.urls import reverse
 
 
-class TestAddress(TestCase):
+class TestAddressViews(TestCase):
     @classmethod
     def setUpTestData(cls) -> None:
         cls.client = Client()
@@ -201,7 +201,7 @@ class TestAddress(TestCase):
             path=self.address_detials_url,
             data={"street": "Rua de update"},
             content_type="application/json",
-            headers={"Authorization": "Bearer " + self.token_user_without_address}
+            headers={"Authorization": "Bearer " + self.token_user_without_address},
         )
 
         expected_response = {"detail": "Not found."}

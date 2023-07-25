@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     "login",
     "users",
     "address",
-    "products"
+    "products",
 ]
 
 MIDDLEWARE = [
@@ -144,5 +144,18 @@ SIMPLE_JWT = {
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
-    )
+    ),
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.MultiPartParser',  # Certifique-se de incluir esta linha
+        'rest_framework.parsers.FormParser',
+    ],
 }
+
+
+CLOUDINARY = {
+    'cloud_name': os.getenv('CLOUD_NAME'),
+    'api_key': os.getenv('CLOUD_API_KEY'),
+    'api_secret': os.getenv('CLOUD_API_SECRET_KEY'),
+}
+
